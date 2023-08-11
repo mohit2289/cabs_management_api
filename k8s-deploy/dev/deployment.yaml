@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: sp-aggregator-dev
+    app.kubernetes.io/instance: sp-aggregator-dev-instance
+    app.kubernetes.io/version: '1.0.0'
+    app.kubernetes.io/managed-by: kubectl
+  name: sp-aggregator-dev-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sp-aggregator-dev
+  template:
+    metadata:
+      labels:
+        app: sp-aggregator-dev
+    spec:
+      containers:
+        - image: 746460560240.dkr.ecr.ap-south-1.amazonaws.com/seller-portal-dev:backend-admin-supplier-aggregator-dev-latest
+          imagePullPolicy: Always
+          name: sp-aggregator-dev
+          ports:
+            - containerPort: 8080
+          
+              

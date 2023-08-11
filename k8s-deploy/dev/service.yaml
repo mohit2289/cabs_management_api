@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: sp-aggregator-dev
+    app.kubernetes.io/instance: sp-aggregator-dev-instance
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/managed-by: kubectl
+  name: sp-aggregator-dev
+spec:
+  selector:
+    app: sp-aggregator-dev
+  type: NodePort
+  ports:
+   -  protocol: TCP
+      port: 8080
+      targetPort: 8080
+

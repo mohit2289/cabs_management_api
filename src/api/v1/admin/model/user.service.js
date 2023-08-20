@@ -1,8 +1,8 @@
 const pool = require('../../../../config/db');
 
-/** 
- * @param {*} data 
- * @returns 
+/**
+ * @param {*} data
+ * @returns
  */
 module.exports.authentication = async (data) => {
 	const { email, password } = data;
@@ -22,8 +22,8 @@ module.exports.authentication = async (data) => {
 	}
 };
 /**
- * 
- * @returns 
+ *
+ * @returns
  */
 module.exports.getUserData = async () => {
 	try {
@@ -39,9 +39,9 @@ module.exports.getUserData = async () => {
 };
 
 /**
- * 
- * @param {*} data 
- * @returns 
+ *
+ * @param {*} data
+ * @returns
  */
 module.exports.addDriver = async (data) => {
 	try {

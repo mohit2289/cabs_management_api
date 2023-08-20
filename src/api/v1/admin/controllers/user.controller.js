@@ -9,6 +9,7 @@ const USER = require('../model/user.service');
  * @param {object} req HttpRequest Object
  * @param {object} res HttpResponse Object
  */
+
 exports.getUserList = async (req, res) => {
 	try {
 		const userData = await USER.getUserData();

@@ -1,43 +1,49 @@
 {
-    "env": {
-      "browser": true,
-      "commonjs": true,
-      "es6": true
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-      "sourceType": "module",
-     // "ecmaVersion": 8,
-      "requireConfigFile": false
-    },
-    "parser": "@babel/eslint-parser",
-    "plugins": [
-      "eslint-plugin-jsdoc",
-      "prefer-arrow"
-      ],
-    "rules": {
-      "no-var": 1,
-      "no-mixed-spaces-and-tabs": 0, // disable rule
-      "no-prototype-builtins": 0, //disable rule
-      "jsdoc/require-param": 2, // Recommended
-      "jsdoc/require-param-description": 2, // Recommended
-      "jsdoc/require-param-name": 2, // Recommended
-      "jsdoc/require-param-type": 2, // Recommended
-      "linebreak-style": ["error", "unix"],
-      "quotes": ["error", "single"],
-      "semi": ["error", "always"],
-      "no-multiple-empty-lines": [1, {"max": 1, "maxEOF": 1}],
-      "jsdoc/require-description": ["error", {"descriptionStyle":"tag"}],
-      "jsdoc/require-jsdoc": ["error", {"publicOnly":{"cjs":true,"esm":true,"window":true},"require":{"FunctionDeclaration":true,"FunctionExpression":true,"ArrowFunctionExpression":true}}],
-	  "prefer-const": ["error", {"destructuring": "all"}],
-      "prefer-arrow/prefer-arrow-functions": [
-        "error",
-        {
-          "disallowPrototype": true,
-          "singleReturnOnly": false
-        }
-      ],
-      "valid-typeof": 0
-    }
-  }
-  
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"sourceType": "module",
+		// "ecmaVersion": 8,
+		"requireConfigFile": false
+	},
+	"parser": "@babel/eslint-parser",
+	"plugins": ["eslint-plugin-jsdoc", "prefer-arrow"],
+	"rules": {
+		"no-var": 1,
+		"no-mixed-spaces-and-tabs": 0, // disable rule
+		"no-prototype-builtins": 0, //disable rule
+		"jsdoc/require-param": 2, // Recommended
+		"jsdoc/require-param-description": 2, // Recommended
+		"jsdoc/require-param-name": 2, // Recommended
+		"jsdoc/require-param-type": 2, // Recommended
+		"linebreak-style": ["error", "unix", "windows"], //
+		"quotes": ["error", "single"],
+		"semi": ["error", "always"],
+		"no-multiple-empty-lines": [1, { "max": 1, "maxEOF": 1 }],
+		"jsdoc/require-description": ["error", { "descriptionStyle": "tag" }],
+		"jsdoc/require-jsdoc": [
+			"error",
+			{
+				"publicOnly": { "cjs": true, "esm": true, "window": true },
+				"require": {
+					"FunctionDeclaration": true,
+					"FunctionExpression": true,
+					"ArrowFunctionExpression": true
+				}
+			}
+		],
+		"prefer-const": ["error", { "destructuring": "all" }],
+		"prefer-arrow/prefer-arrow-functions": [
+			"error",
+			{
+				"disallowPrototype": true,
+				"singleReturnOnly": false
+			}
+		],
+		"valid-typeof": 0
+	}
+}

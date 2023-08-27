@@ -16,18 +16,10 @@ module.exports.addAirBusRail = async (data) => {
 				status,
 				added_date,
 			} = data;
-			console.log(data)
+			console.log(data);
 			pool.query(
 				sql,
-				[
-					type,
-					state,
-					city,
-					stand_name,
-					stand_address,
-					status,
-					added_date,
-				],
+				[type, state, city, stand_name, stand_address, status, added_date],
 				(err, results) => {
 					if (err) return rej(err);
 					res(results);

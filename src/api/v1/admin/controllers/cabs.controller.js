@@ -9,8 +9,10 @@ const moment = require('moment');
  */
 exports.addCabCategory = async (req, res) => {
 	try {
-		let cabCategoryData = req.body; 
-		cabCategoryData.added_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
+		let cabCategoryData = req.body;
+		cabCategoryData.added_date = moment(new Date()).format(
+			'yyyy-MM-DD hh:mm:ss'
+		);
 		const result = await CABS.addCabCategory(cabCategoryData);
 		handleSuccess(res, result);
 	} catch (error) {
@@ -25,7 +27,7 @@ exports.addCabCategory = async (req, res) => {
  */
 exports.addCabs = async (req, res) => {
 	try {
-		const cabsData = req.body; 
+		const cabsData = req.body;
 		cabsData.added_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		const result = await CABS.addCabs(cabsData); // Placeholder for the addCabs function in cabs.service.js
 		handleSuccess(res, result);

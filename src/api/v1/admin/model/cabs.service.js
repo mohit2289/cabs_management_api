@@ -25,7 +25,7 @@ module.exports.addCabCategory = async (data) => {
 
 module.exports.addCabs = async (data) => {
 	try {
-		console.log(data)
+		console.log(data);
 		return await new Promise((res, rej) => {
 			const sql = `INSERT INTO cabs 
         (cab_name, model_year, category_id, cab_seat, no_bags, amenities, status, added_date) 

@@ -12,12 +12,12 @@ const adminRouterV1 = require('../api/v1/admin/routes');
 
 const app = express();
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse application/json
 app.use(bodyParser.json());
 
-app.use(cors());
+app.use(cors())
 
 app.use(helmet());
 

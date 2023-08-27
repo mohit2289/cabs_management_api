@@ -1,5 +1,6 @@
 const { handleSuccess, handleFailure } = require('../../../../utils/helpers');
 const CABS = require('../model/cabs.service');
+const moment = require('moment');
 
 /**
  * @description This method related to add a new cab category
@@ -8,7 +9,8 @@ const CABS = require('../model/cabs.service');
  */
 exports.addCabCategory = async (req, res) => {
 	try {
-		const cabCategoryData = req.body; // Assuming the request body contains the necessary data for cab category
+		let cabCategoryData = req.body; 
+		cabCategoryData.added_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		const result = await CABS.addCabCategory(cabCategoryData);
 		handleSuccess(res, result);
 	} catch (error) {
@@ -23,7 +25,8 @@ exports.addCabCategory = async (req, res) => {
  */
 exports.addCabs = async (req, res) => {
 	try {
-		const cabsData = req.body; // Assuming the request body contains the necessary data for cabs
+		const cabsData = req.body; 
+		cabsData.added_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		const result = await CABS.addCabs(cabsData); // Placeholder for the addCabs function in cabs.service.js
 		handleSuccess(res, result);
 	} catch (error) {

@@ -25,6 +25,7 @@ module.exports.addCabCategory = async (data) => {
 
 module.exports.addCabs = async (data) => {
 	try {
+		console.log(data)
 		return await new Promise((res, rej) => {
 			const sql = `INSERT INTO cabs 
         (cab_name, model_year, category_id, cab_seat, no_bags, amenities, status, added_date) 
@@ -49,7 +50,7 @@ module.exports.addCabs = async (data) => {
 					category_id,
 					cab_seat,
 					no_bags,
-					amenities,
+					amenities.toString(),
 					status,
 					added_date,
 				],
@@ -67,7 +68,14 @@ module.exports.addCabs = async (data) => {
 module.exports.getAllCabs = async () => {
 	try {
 		return await new Promise((res, rej) => {
-			const sql = `SELECT * FROM cabs;`;
+			const sql = `SELECT cabs.cab_name,
+						cabs.model_year, 
+						cabs.cab_seat, 
+						cabs.no_bags,
+						cabs.amenities,
+						cabs.status,
+						cab_category.category_name 
+						FROM cabs left join cab_category on cabs.category_id = cab_category.category_id ;`;
 			pool.query(sql, (err, results) => {
 				if (err) return rej(err);
 				res(results);

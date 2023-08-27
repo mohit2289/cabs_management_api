@@ -4,8 +4,8 @@ module.exports.addAirBusRail = async (data) => {
 	try {
 		return await new Promise((res, rej) => {
 			const sql = `INSERT INTO air_rail_bus_stands 
-        (type, state, city, stand_name, stand_address, order, status, added_date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+        (type, state, city, stand_name, stand_address, status, added_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?);`;
 
 			const {
 				type,
@@ -13,11 +13,10 @@ module.exports.addAirBusRail = async (data) => {
 				city,
 				stand_name,
 				stand_address,
-				order,
 				status,
 				added_date,
 			} = data;
-
+			console.log(data)
 			pool.query(
 				sql,
 				[
@@ -26,7 +25,6 @@ module.exports.addAirBusRail = async (data) => {
 					city,
 					stand_name,
 					stand_address,
-					order,
 					status,
 					added_date,
 				],

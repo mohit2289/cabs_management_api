@@ -68,12 +68,15 @@ module.exports.addCabs = async (data) => {
 module.exports.getAllCabs = async () => {
 	try {
 		return await new Promise((res, rej) => {
-			const sql = `SELECT cabs.cab_name,
+			const sql = `SELECT 
+						cabs.cab_id,			
+						cabs.cab_name,
 						cabs.model_year, 
 						cabs.cab_seat, 
 						cabs.no_bags,
 						cabs.amenities,
 						cabs.status,
+						cabs.category_id,
 						cab_category.category_name 
 						FROM cabs left join cab_category on cabs.category_id = cab_category.category_id ;`;
 			pool.query(sql, (err, results) => {
@@ -91,6 +94,28 @@ module.exports.getAllCabCategories = async () => {
 		return await new Promise((res, rej) => {
 			const sql = `SELECT * FROM cab_category;`;
 			pool.query(sql, (err, results) => {
+				if (err) return rej(err);
+				res(results);
+			});
+		});
+	} catch (err) {
+		console.log(`${err.name}: ${err.message}`);
+	}
+};
+
+module.exports.getCabsByCategoryId = async (categoryId) => {
+	try {
+		return await new Promise((res, rej) => {
+			const sql = `SELECT cabs.cab_id, cabs.cab_name,
+						cabs.model_year, 
+						cabs.cab_seat, 
+						cabs.no_bags,
+						cabs.amenities,
+						cabs.status,
+						cabs.category_id,
+						cab_category.category_name 
+						FROM cabs left join cab_category on cabs.category_id = cab_category.category_id  where cabs.category_id = ?;`;
+			pool.query(sql, [categoryId], (err, results) => {
 				if (err) return rej(err);
 				res(results);
 			});

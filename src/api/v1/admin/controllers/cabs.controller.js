@@ -63,3 +63,18 @@ exports.getAllCabCategories = async (req, res) => {
 		handleFailure(res, 500, error);
 	}
 };
+
+/**
+ * @description This method retrieves all cab categories from the database
+ * @param {object} req HttpRequest Object
+ * @param {object} res HttpResponse Object
+ */
+exports.getCabsByCategoryId = async (req, res) => {
+	try {
+		const categoryid = req.params.categoryid;
+		const allCabs = await CABS.getCabsByCategoryId(categoryid);
+		handleSuccess(res, allCabs);
+	} catch (error) {
+		handleFailure(res, 500, error);
+	}
+};

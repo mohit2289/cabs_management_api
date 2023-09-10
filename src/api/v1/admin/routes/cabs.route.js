@@ -12,5 +12,5 @@ router.post('/addCabCategory', cabsController.addCabCategory);
 router.post('/addCabs', cabsController.addCabs);
 router.get('/getAllCabs', cabsController.getAllCabs);
 router.get('/getAllCabCategories', cabsController.getAllCabCategories);
-
+router.get('/category/:categoryid', cabsController.getCabsByCategoryId);
 module.exports = router;

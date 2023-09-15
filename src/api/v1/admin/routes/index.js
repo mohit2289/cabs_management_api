@@ -12,6 +12,8 @@ const cityRoute = require('./city.route');
 const stateRoute = require('./state.route');
 const distanceRoute = require('./distance.route');
 const driverRoute = require('./driver.route');
+const localpackageRoute = require('./localpackage.route');
+const fareRoute = require('./fare.route');
 
 const bodyParser = require('body-parser');
 const app = express();
@@ -33,4 +35,6 @@ router.use('/city', cityRoute);
 router.use('/distance', distanceRoute);
 router.use('/driver', driverRoute);
 router.use('/state', stateRoute);
+router.use('/localpackage', localpackageRoute);
+router.use('/fare', fareRoute);
 module.exports = router;

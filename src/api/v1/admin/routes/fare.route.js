@@ -10,5 +10,6 @@ const valid = require('../validations/fare.validation');
 
 router.post('/add-fare', fareController.addFare);
 router.get('/get-all-fare', fareController.getAllFareList);
+router.post('/search-cab', fareController.getSearhCab);
 
 module.exports = router;

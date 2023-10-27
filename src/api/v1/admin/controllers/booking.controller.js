@@ -1,15 +1,14 @@
 const { handleSuccess, handleFailure } = require('../../../../utils/helpers');
-const FARE = require('../model/fare.service');
+const BOOKING = require('../model/booking.service');
 
 /**
  * @description This method related to add a new city distance
  * @param {object} req HttpRequest Object
  * @param {object} res HttpResponse Object
  */
-exports.addFare = async (req, res) => {
+exports.addbooking = async (req, res) => {
 	try {
-		const distanceData = req.body; // Assuming the request body contains the necessary data for city distance
-		const result = await FARE.addFare(distanceData);
+		const result = await BOOKING.addbooking(req.body);
 		handleSuccess(res, result);
 	} catch (error) {
 		handleFailure(res, 500, error);
@@ -81,13 +80,11 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	let ignore_hrs = '';
 	let ignore_km = '';
 	let minimumCharge = '';
-	let minimum_charge = '';
 	let distance = '';
 	let totalbill = '';
 	let local_pkg_fare_mode = '';
 	let local_pkg_name = '';
 	let duration = 0;
-	let driver_allowns = 300;
 	let searchVehicleDetail = [];
 	for (var i = 0; i < faredata.length; i++) {
 		let base_vehicle_id = faredata[i].base_vehicle_id;
@@ -99,11 +96,10 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			totalbill = localpkgData.price;
 			ignore_hrs = localpkgData.hrs;
 			ignore_km = localpkgData.km;
-			minimumCharge = localpkgData.price;
+			minimumCharge = totalbill;
 			distance = localpkgData.km;
 			local_pkg_fare_mode = localpkgData.package_mode_id;
 			local_pkg_name = localpkgData.name;
-			local_pkg_fare = localpkgData.local_pkg_fare;
 
 			let base_comb_id = faredata[i].base_comb_id;
 			let master_packge_mode_id = faredata[i].master_package_mode_id;
@@ -142,13 +138,10 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			if (getmodeFare.length > 0) {
 				getmodeFare = getmodeFare[0]
 				vehicleFare = await FARE.getfareCalculation(param1, getmodeFare);
-				totalbill = Number(vehicleFare.totalbill) + Number(driver_allowns);
 				totalbill = Math.round(totalbill);
+				//console.log(val.minimum_charge); return false;
 
 				vehicleFare.base_comb_id = base_comb_id;
-				vehicleFare.master_package_id = master_package_id;
-				vehicleFare.master_packge_mode_id = master_packge_mode_id;
-				vehicleFare.city_id = cityid;
 				vehicleFare.city_name = city_name;
 				vehicleFare.local_pkg_name = local_pkg_name;
 				vehicleFare.vehicle_type_id = vehicle_type_id;
@@ -161,10 +154,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 				vehicleFare.ignition_type = ignition_type;
 				vehicleFare.base_fare = Number(vehicleFare.minimum_charge).toFixed(2);    // base fare + markup //
 				vehicleFare.per_km_price = Number(vehicleFare.per_km_charge).toFixed(2);  // per km + markup //
-				vehicleFare.totalbill = Number(totalbill).toFixed(2);
-				vehicleFare.min_pkg_km = min_pkg_km;
-			    vehicleFare.min_pkg_hrs = min_pkg_hrs;
-			    vehicleFare.driver_allowns = driver_allowns;
+				vehicleFare.totalbill = Number(vehicleFare.totalbill).toFixed(2);
 			}		
 				searchVehicleDetail.push(vehicleFare)
 		}

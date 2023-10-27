@@ -1,59 +1,97 @@
 const pool = require('../../../../config/db');
+const {generateBookingNo} =  require('../../../../utils/helpers');
 const moment = require('moment');
 
-module.exports.addFare = async (data) => {
+module.exports.addbooking = async (data) => {
 	try {
 		data.created_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		data.date_from = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		data.date_to = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		data.created_by = data.created_by ? data.created_by : 1;
+		data.user_id = data.user_id ? data.user_id : 1;
 
-		const fareExistStatus = await checkFareExist(data);
-		if(!fareExistStatus) {
-			const resp = await addCityPackageMode(data);
-			data.base_comb_id = resp.insertId;
-			const basevehicleResp = await addBaseVehicleType(data);
-			data.base_vehicle_id = basevehicleResp.insertId;
-			const resp2 = await addLocalPackageBaseFare(data);
-			const resp3 = await addDistanceHourExtraCharges(data);
-			return resp3;
-		} else {
-			return {status:"false",message:"fare already exist"}
-		}
-	
+		const resp = await addNewBooking(data);
+		data.booking_id = resp.insertId;
+		const resp2 = await addBookingEstimation(data);
+		//const resp3 = await addDistanceHourExtraCharges(data);
+		return resp;
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
 };
 
-const addCityPackageMode = async (data) => {
+const addNewBooking = async (data) => {
 	try {
+		let yearmonth = moment(new Date()).format('YYMM');
+		let generateBookingref = generateBookingNo();
+		let bookingRef = `TK${generateBookingref}${yearmonth}`;
+		data.booking_reference = bookingRef;
+		data.booking_status = 1;
+		data.created_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
+		//data.created_by = data.created_by ? data.created_by : 1;
 		return await new Promise((res, rej) => {
-			const sql = `INSERT INTO city_package_mode 
-        (city_id, master_package_id, master_package_mode_id, date_from,date_to, created_date,created_by, status) 
-        VALUES (?, ?, ?, ?, ?, ? ,?,?);`;
+		
+		const sql = `INSERT INTO booking 
+        (
+		user_id,
+		booking_reference,
+		booking_status,
+		master_package_mode_id,
+		master_package_id,
+		master_vehicle_type_id,
+		base_vehicle_id,
+		vehicle_master_id,
+		name, 
+		mobile, 
+		email, 
+		passenger, 
+		pickup_address, 		
+		drop_address, 
+		travel_date, 
+		travel_time,
+		created_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
 			const {
-				city_id,
-				master_package_id,
+				user_id,
+				booking_reference,
+				booking_status,
 				master_package_mode_id,
-				date_from,
-				date_to,
-				created_date,
-				created_by,
+				master_package_id,
+				master_vehicle_type_id,
+				base_vehicle_id,
+				vehicle_master_id,
+				name, 
+				mobile, 
+				email, 
+				passenger, 
+				pickup_address, 		
+				drop_address, 
+				travel_date, 
+				travel_time,
+				created_date
 			} = data;
 
 			pool.query(
 				sql,
 				[
-					city_id,
-					master_package_id,
+					user_id,
+					booking_reference,
+					booking_status,
 					master_package_mode_id,
-					date_from,
-					date_to,
-					created_date,
-					created_by,
-					'1',
+					master_package_id,
+					master_vehicle_type_id,
+					base_vehicle_id,
+					vehicle_master_id,
+					name, 
+					mobile, 
+					email, 
+					passenger, 
+					pickup_address, 		
+					drop_address, 
+					travel_date, 
+					travel_time,
+					created_date
 				],
 				(err, results) => {
 					if (err) return rej(err);
@@ -66,30 +104,39 @@ const addCityPackageMode = async (data) => {
 	}
 };
 
-const addLocalPackageBaseFare = async (data) => {
+const addBookingEstimation = async (data) => {
 	try {
 		return await new Promise((res, rej) => {
-			const sql = `INSERT INTO local_package_fare 
-        (base_vehicle_id, local_pkg_id, local_pkg_fare, created_date,created_by, status) 
-        VALUES (?, ?, ?, ?, ?, ?);`;
+			const sql = `INSERT INTO booking_estimation 
+        (booking_id, estimated_time, estimated_distance, estimated_final_price,approx_after_km, approx_after_hour,approx_hour_charge,approx_distance_charge,minimum_charge,created_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ? ,? ,?, ?);`;
 
 			const {
-				base_vehicle_id,
-				local_package,
-				local_pkg_fare,
-				created_date,
-				created_by,
+				booking_id,
+				estimated_time,
+				estimated_distance,
+				estimated_final_price,
+				approx_after_km,
+				approx_after_hour,
+				approx_hour_charge,
+				approx_distance_charge,
+				minimum_charge,
+				created_date
 			} = data;
 
 			pool.query(
 				sql,
 				[
-					base_vehicle_id,
-					local_package,
-					local_pkg_fare,
-					created_date,
-					created_by,
-					'1',
+					booking_id,
+					estimated_time,
+					estimated_distance,
+					estimated_final_price,
+					approx_after_km,
+					approx_after_hour,
+					approx_hour_charge,
+					approx_distance_charge,
+					minimum_charge,
+					created_date
 				],
 				(err, results) => {
 					if (err) return rej(err);
@@ -110,7 +157,7 @@ const addDistanceHourExtraCharges = async (data) => {
         VALUES (?, ?, ?, ?, ?, ?);`;
 
 			const {
-				base_vehicle_id,
+				vehicle_model,
 				per_km_charge,
 				per_hr_charge,
 				created_date,
@@ -120,7 +167,7 @@ const addDistanceHourExtraCharges = async (data) => {
 			pool.query(
 				sql,
 				[
-					base_vehicle_id,
+					vehicle_model,
 					per_km_charge,
 					per_hr_charge,
 					created_date,
@@ -138,86 +185,53 @@ const addDistanceHourExtraCharges = async (data) => {
 	}
 };
 
-const addBaseVehicleType = async(data)=>{
-	try {
-		return await new Promise((res, rej) => {
-			const sql = `INSERT INTO base_vehicle_type 
-        (base_comb_id, vehicle_type_id, vehicle_master_id, created_date,created_by, status) 
-        VALUES (?, ?, ?, ?, ?, ?);`;
-
-			const {
-				base_comb_id,
-				vehicle_category,
-				vehicle_model,
-				created_date,
-				created_by,
-			} = data;
-
-			pool.query(
-				sql,
-				[
-					base_comb_id,
-					vehicle_category,
-					vehicle_model,
-					created_date,
-					created_by,
-					'1',
-				],
-				(err, results) => {
-					if (err) return rej(err);
-					res(results);
-				}
-			);
-		});
-	} catch (err) {
-		console.log(`${err.name}: ${err.message}`);
-	}
-}
-
 module.exports.getAllFareList = async (data) => {
 	try {
 		return await new Promise((res, rej) => {
-			const sql = ` Select 
+			const sql = `SELECT
+			bc.city_id,
+			city.name as city_name,
 			bc.id AS base_comb_id,
-            bc.city_id,			
-			city.name as city_name,		
-			bvt.base_vehicle_id	,
-			lpf.local_pkg_id,
-            lpf.local_pkg_fare,
-             lp.name as local_pkg_name,
-             lp.hrs,
-              lp.km,
-            mpm.id AS master_package_mode_id,
+			bc.date_from,
+			bc.date_to,
+			bvt.base_vehicle_id,
+			mpm.id AS master_package_mode_id,
 			mpm.package_mode,
-           mvt.id AS master_vehicle_type_id,
-		mvt.vehicle_type,
-		vmodel.name  as vehicle_name,
-		mvt.vehicle_image,
+			mp.id AS master_package_id,
+			mp.name AS package_name,
+			mp.image,
+			mvt.id AS master_vehicle_type_id,
+			mvt.vehicle_type,
+			vmodel.name  as vehicle_name,
+			mvt.vehicle_image,
 			mvt.seating_capacity,
 			mvt.amenities,
-		mvt.luggage,
-             dhf.per_km_charge,
+			mvt.luggage,
+			lpf.local_pkg_fare,
+			dhf.per_km_charge,
 			dhf.per_hr_charge
 		  FROM
 			city_package_mode AS bc
-		  inner JOIN
-			base_vehicle_type AS bvt ON  bvt.base_comb_id = bc.id
-		 left JOIN 
- 		   local_package_fare AS lpf ON bvt.base_vehicle_id = lpf.base_vehicle_id
-		 INNER join 
+		  INNER JOIN
+			base_vehicle_type AS bvt ON bc.id = bvt.base_comb_id 
+		  INNER JOIN 
+		   local_package_fare AS lpf ON bvt.base_vehicle_id = lpf.base_vehicle_id
+		  INNER join 
 		   local_package AS lp ON lpf.local_pkg_id = lp.id
-		 LEFT JOIN
+		  LEFT JOIN
 			master_package_mode AS mpm ON lp.booking_mode = mpm.id
-		LEFT JOIN
+		  LEFT JOIN
+			master_package AS mp ON lp.id = mp.id 
+		  LEFT JOIN
 			master_vehicle_type AS mvt ON bvt.vehicle_type_id = mvt.id 
- 		LEFT JOIN
-		  master_vehicle_model as vmodel ON bvt.vehicle_master_id = vmodel.id
- 		left JOIN 
+		  LEFT JOIN
+		  master_vehicle_model as vmodel ON mvt.id =vmodel.vehicle_type_id
+		  left join 
+		  master_city as city ON bc.city_id = city.id 
+		  left JOIN 
  		  distance_hour_fare AS dhf ON bvt.base_vehicle_id = dhf.base_vehicle_id
-		   INNER join 
-		   master_city as city ON bc.city_id = city.id 
-		   WHERE
-			bc.status  ='1'
+		  WHERE
+			bc.status  = 1 
 			 ;`;
 			pool.query(sql, (err, results) => {
 				if (err) return rej(err);
@@ -229,7 +243,7 @@ module.exports.getAllFareList = async (data) => {
 	}
 };
 
-module.exports.sp_fare_details = async (data) => {
+module.exports.sp_fare_details = async(data) => {
 	try {
 		return await new Promise((res, rej) => {
 			const sql = `SELECT
@@ -290,7 +304,7 @@ module.exports.sp_fare_details = async (data) => {
 	}
 }
 
-module.exports.getPackageFareByPackageId = async (base_vehicle_id, local_pkg_id) => {
+module.exports.getPackageFareByPackageId = async(base_vehicle_id,local_pkg_id) =>{
 	try {
 		return await new Promise((res, rej) => {
 			const sql = `select lp.id AS local_pkg_id, 
@@ -313,27 +327,28 @@ module.exports.getPackageFareByPackageId = async (base_vehicle_id, local_pkg_id)
 				res(results);
 			});
 		});
-	} catch (err) {
+	}catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
 }
 
-module.exports.getfareCalculation = async (param, fareData) => {
+module.exports.getfareCalculation = async(param, fareData) => {
 	return new Promise((resolve, reject) => {
 		var datam1 = {};
 		var permntavr = 40 / 60;
 		var markupPrice = 0;             // This markup price will be calculate on base fare//
 		var markupData = param.markupData;
-		let distance = param.distance;
-		let duration = param.duration;
-		let packagemodeid = param.master_package_mode_id;
+		var distance = param.distance;
+		var duration = param.duration;
+		var packagemodeid = param.master_package_mode_id;
 		let status = param.status;
 		let ignore_hrs = param.ignore_hrs;
 		let ignore_km = param.ignore_km;
 		let minimumCharge = param.minimumCharge;
 		let master_package_type = param.master_package_type;
-		let total_days = param.total_days;
-		let EstimatedPrice;
+		var total_days = param.total_days;
+
+		
 		if (packagemodeid == 1) {
 			ignore_hrs = 0;
 			ignore_km = (typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
@@ -351,7 +366,7 @@ module.exports.getfareCalculation = async (param, fareData) => {
 			ignore_km = (typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
 			minimumCharge = (typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
 		}
-
+		
 
 		if (master_package_type == "4") {
 			ignore_km = ignore_km * total_days;
@@ -366,9 +381,9 @@ module.exports.getfareCalculation = async (param, fareData) => {
 			if (distance > ignore_km) {
 				let ExtraKM = distance - ignore_km;
 				let ExtraFare = ExtraKM * ((typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0);
-				EstimatedPrice = Number(ExtraFare) + Number(minimumCharge);
+				let EstimatedPrice = Number(ExtraFare) + Number(minimumCharge);
 			} else {
-				EstimatedPrice = minimumCharge;
+				let EstimatedPrice = minimumCharge;
 			}
 
 			datam1.per_km_charge = (typeof fareData.per_km_charge) ? fareData.per_km_charge : 0;
@@ -383,16 +398,16 @@ module.exports.getfareCalculation = async (param, fareData) => {
 
 			let ignore_first_hours = ignore_hrs * 60; //die;
 			if (totalmint > ignore_hrs) {
-				let hourlyRate = (totalmint - ignore_hrs) * 60;
+				let hourlyRate = (totalmint - ignore_hrs)*60;
 
 				let rate_per_min = ((typeof fareData.per_hr_charge) ? fareData.per_hr_charge : 0) / 60;
-				EstimatedPrice = hourlyRate * rate_per_min;
+				let EstimatedPrice = hourlyRate * rate_per_min;
 
 			} else {
-				EstimatedPrice = minimumCharge;
+				let EstimatedPrice = minimumCharge;
 			}
 			//// In Case per Hourly Charge 120 Rs and If car is running 40 Km Per hrs then per km charge is 120/40 is 3 Rs per Km Charge
-			EstimatedPrice = Number(EstimatedPrice) + Number(minimumCharge);
+			let EstimatedPrice =  Number(EstimatedPrice) + Number(minimumCharge);
 
 			datam1.per_km_charge = 0;
 			datam1.per_hr_charge = (typeof fareData.per_hr_charge !== 'undefined') ? fareData.per_hr_charge : 0;
@@ -404,9 +419,9 @@ module.exports.getfareCalculation = async (param, fareData) => {
 
 			ignore_hrs = ignore_hrs; //(typeof fareData.minimum_hrs !== 'undefined') ? fareData.minimum_hrs : 0;
 			ignore_km = ignore_km;//(typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
-			minimumCharge = param.minimumCharge;//(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			minimumCharge = minimumCharge;//(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
 			let travel_hrs = parseInt(duration);        //come from travell distance hour//
-			let hourlyRate = 0;
+			let hourlyRate= 0;
 			let distanceRate = 0;
 			if (distance < ignore_km) {
 				distanceRate = 0;
@@ -416,19 +431,18 @@ module.exports.getfareCalculation = async (param, fareData) => {
 			if (travel_hrs < ignore_hrs) {
 				hourlyRate = 0;
 			} else {
-				hourlyRate = (travel_hrs - ignore_hrs) * 60;
+				hourlyRate = (travel_hrs - ignore_hrs)*60;
 				let rate_per_min = ((typeof fareData.per_hr_charge) ? fareData.per_hr_charge : 0) / 60;
 				hourlyRate = hourlyRate * rate_per_min;
 			}
 
-			//EstimatedPrice = Number(distanceRate) + Number(hourlyRate) + Number(minimumCharge);
-			EstimatedPrice = Number(minimumCharge);
+			var EstimatedPrice = Number(distanceRate) + Number(hourlyRate) + Number(minimumCharge);
 
 			datam1.min_distance = ignore_km;
 			datam1.minimum_charge = minimumCharge;
 			datam1.per_km_charge = (typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0;
 			datam1.per_hr_charge = (typeof fareData.per_hr_charge !== 'undefined') ? fareData.per_hr_charge : 0;
-			//console.log('mokk---',datam1);
+			//console.log(datam1);
 
 		} else if (packagemodeid == 4) {        //Distance + Waiting //
 			//console.log(distance); //return false;
@@ -436,7 +450,7 @@ module.exports.getfareCalculation = async (param, fareData) => {
 			let ignore_km = ignore_km;//(typeof fareData.minimum_distance) ? fareData.minimum_distance : 0;
 			let minimumCharge = minimumCharge;//(typeof fareData.minimum_charge) ? fareData.minimum_charge : 0;
 			//console.log(minimumCharge);return false;
-
+			let EstimatedPrice;
 			if (distance > ignore_km) {
 				let ExtraKM = Number(distance) - Number(ignore_km);
 				let ExtraFare = ExtraKM * ((typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0);
@@ -461,70 +475,30 @@ module.exports.getfareCalculation = async (param, fareData) => {
 	});
 }
 
-module.exports.getFareByPackagemodeId = async (pkgmodeid, basevehicleid) => {
+module.exports.getFareByPackagemodeId = async(pkgmodeid, basevehicleid) =>{
 	let packagemodeid = pkgmodeid;
-	let sqlquery = '';
-	if (packagemodeid == 1) {
+	let sqlquery='';
+	if(packagemodeid==1){
 		sqlquery = `SELECT * FROM distance_fare WHERE base_vehicle_id=${basevehicleid};`
-	} else if (packagemodeid == 2) {
+	}else if(packagemodeid == 2 ){
 		sqlquery = `SELECT * FROM hourly_fare WHERE base_vehicle_id=${basevehicleid};`
 	}
-	else if (packagemodeid == 3) {
+	else if(packagemodeid == 3 ){
 		sqlquery = `SELECT * FROM distance_hour_fare WHERE base_vehicle_id=${basevehicleid};`
 	}
-	else if (packagemodeid == 4) {
+	else if(packagemodeid == 4 ){
 		sqlquery = `SELECT * FROM distance_waiting_fare WHERE base_vehicle_id=${basevehicleid};`
 	}
 
 	try {
-		return await new Promise((res, rej) => {
+		return await new Promise((res, rej) => {			
 			pool.query(sqlquery, (err, results) => {
 				if (err) return rej(err);
 				res(results);
 			});
 		});
-	} catch (err) {
+	}catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-
-}
-
-const checkFareExist = async (obj) => {
-	try {
-		return await new Promise((res, rej) => {
-			const sql = ` Select 
-			bc.id AS base_comb_id,
-            bc.city_id,			
-			bvt.base_vehicle_id	,
-			lpf.local_pkg_id,
-            lpf.local_pkg_fare 
-            
-		  FROM
-			city_package_mode AS bc
-		  INNER JOIN
-			base_vehicle_type AS bvt ON  bvt.base_comb_id = bc.id
-		  INNER JOIN 
- 		   local_package_fare AS lpf ON bvt.base_vehicle_id = lpf.base_vehicle_id
-		 		
-			WHERE bc.city_id = ${obj.city_id}
-			AND  bc.master_package_id = ${obj.master_package_id}
-			AND  bc.master_package_mode_id = ${obj.master_package_mode_id}
-			AND  bvt.vehicle_type_id = ${obj.vehicle_category}
-			AND  bvt.vehicle_master_id = ${obj.vehicle_model}
-			AND  lpf.local_pkg_id = ${obj.local_package}
-			AND  bc.status  ='1' `;
-			pool.query(sql, (err, results) => {
-				if (err) return rej(err);
-				if(results.length>0){
-					console.log(results.length)
-					res(true);
-				}else{
-					res(false);
-				}
-				
-			});
-		});
-	} catch (err) {
-		console.log(`${err.name}: ${err.message}`);
-	}
+	
 }

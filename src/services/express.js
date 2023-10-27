@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-app.use(helmet());
+//app.use(helmet());
 
 // passport
 app.use('/health', (req, res) => {

@@ -9,7 +9,7 @@ module.exports.addFare = async (data) => {
 		data.created_by = data.created_by ? data.created_by : 1;
 
 		const fareExistStatus = await checkFareExist(data);
-		if(!fareExistStatus) {
+		if (!fareExistStatus) {
 			const resp = await addCityPackageMode(data);
 			data.base_comb_id = resp.insertId;
 			const basevehicleResp = await addBaseVehicleType(data);
@@ -18,9 +18,8 @@ module.exports.addFare = async (data) => {
 			const resp3 = await addDistanceHourExtraCharges(data);
 			return resp3;
 		} else {
-			return {status:"false",message:"fare already exist"}
+			return { status: 'false', message: 'fare already exist' };
 		}
-	
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
@@ -138,7 +137,7 @@ const addDistanceHourExtraCharges = async (data) => {
 	}
 };
 
-const addBaseVehicleType = async(data)=>{
+const addBaseVehicleType = async (data) => {
 	try {
 		return await new Promise((res, rej) => {
 			const sql = `INSERT INTO base_vehicle_type 
@@ -172,7 +171,7 @@ const addBaseVehicleType = async(data)=>{
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
 module.exports.getAllFareList = async (data) => {
 	try {
@@ -288,9 +287,12 @@ module.exports.sp_fare_details = async (data) => {
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
-module.exports.getPackageFareByPackageId = async (base_vehicle_id, local_pkg_id) => {
+module.exports.getPackageFareByPackageId = async (
+	base_vehicle_id,
+	local_pkg_id
+) => {
 	try {
 		return await new Promise((res, rej) => {
 			const sql = `select lp.id AS local_pkg_id, 
@@ -316,13 +318,13 @@ module.exports.getPackageFareByPackageId = async (base_vehicle_id, local_pkg_id)
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
 module.exports.getfareCalculation = async (param, fareData) => {
 	return new Promise((resolve, reject) => {
 		var datam1 = {};
 		var permntavr = 40 / 60;
-		var markupPrice = 0;             // This markup price will be calculate on base fare//
+		var markupPrice = 0; // This markup price will be calculate on base fare//
 		var markupData = param.markupData;
 		let distance = param.distance;
 		let duration = param.duration;
@@ -336,58 +338,85 @@ module.exports.getfareCalculation = async (param, fareData) => {
 		let EstimatedPrice;
 		if (packagemodeid == 1) {
 			ignore_hrs = 0;
-			ignore_km = (typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
-			minimumCharge = (typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			ignore_km =
+				typeof fareData.minimum_distance !== 'undefined'
+					? fareData.minimum_distance
+					: 0;
+			minimumCharge =
+				typeof fareData.minimum_charge !== 'undefined'
+					? fareData.minimum_charge
+					: 0;
 		} else if (packagemodeid == 2) {
-			ignore_hrs = (typeof fareData.minimum_hrs !== 'undefined') ? fareData.minimum_hrs : 0;
+			ignore_hrs =
+				typeof fareData.minimum_hrs !== 'undefined' ? fareData.minimum_hrs : 0;
 			ignore_km = 0;
-			minimumCharge = (typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			minimumCharge =
+				typeof fareData.minimum_charge !== 'undefined'
+					? fareData.minimum_charge
+					: 0;
 		} else if (packagemodeid == 3) {
-			ignore_hrs = (typeof fareData.minimum_hrs !== 'undefined') ? fareData.minimum_hrs : 0;
-			ignore_km = (typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
-			minimumCharge = (typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			ignore_hrs =
+				typeof fareData.minimum_hrs !== 'undefined' ? fareData.minimum_hrs : 0;
+			ignore_km =
+				typeof fareData.minimum_distance !== 'undefined'
+					? fareData.minimum_distance
+					: 0;
+			minimumCharge =
+				typeof fareData.minimum_charge !== 'undefined'
+					? fareData.minimum_charge
+					: 0;
 		} else if (packagemodeid == 4) {
 			ignore_hrs = 0;
-			ignore_km = (typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
-			minimumCharge = (typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			ignore_km =
+				typeof fareData.minimum_distance !== 'undefined'
+					? fareData.minimum_distance
+					: 0;
+			minimumCharge =
+				typeof fareData.minimum_charge !== 'undefined'
+					? fareData.minimum_charge
+					: 0;
 		}
 
-
-		if (master_package_type == "4") {
+		if (master_package_type == '4') {
 			ignore_km = ignore_km * total_days;
 			minimumCharge = minimumCharge * total_days;
 		}
 
-
 		if (packagemodeid == 1) {
-			let distance = distance;       // This will come from local package //
+			let distance = distance; // This will come from local package //
 			let travel_hrs = ignore_hrs;
 
 			if (distance > ignore_km) {
 				let ExtraKM = distance - ignore_km;
-				let ExtraFare = ExtraKM * ((typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0);
+				let ExtraFare =
+					ExtraKM *
+					(typeof fareData.per_km_charge !== 'undefined'
+						? fareData.per_km_charge
+						: 0);
 				EstimatedPrice = Number(ExtraFare) + Number(minimumCharge);
 			} else {
 				EstimatedPrice = minimumCharge;
 			}
 
-			datam1.per_km_charge = (typeof fareData.per_km_charge) ? fareData.per_km_charge : 0;
+			datam1.per_km_charge = typeof fareData.per_km_charge
+				? fareData.per_km_charge
+				: 0;
 			datam1.min_distance = ignore_km;
 			datam1.minimum_charge = minimumCharge;
-
-		} else if (packagemodeid == 2) {      // Hourly mode Fare Calculation //
+		} else if (packagemodeid == 2) {
+			// Hourly mode Fare Calculation //
 			let totalmint = parseInt(duration);
 			let ignore_hrs = ignore_hrs;
 			let ignore_km = 0;
-			let minimumCharge = minimumCharge;//(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			let minimumCharge = minimumCharge; //(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
 
 			let ignore_first_hours = ignore_hrs * 60; //die;
 			if (totalmint > ignore_hrs) {
 				let hourlyRate = (totalmint - ignore_hrs) * 60;
 
-				let rate_per_min = ((typeof fareData.per_hr_charge) ? fareData.per_hr_charge : 0) / 60;
+				let rate_per_min =
+					(typeof fareData.per_hr_charge ? fareData.per_hr_charge : 0) / 60;
 				EstimatedPrice = hourlyRate * rate_per_min;
-
 			} else {
 				EstimatedPrice = minimumCharge;
 			}
@@ -395,29 +424,37 @@ module.exports.getfareCalculation = async (param, fareData) => {
 			EstimatedPrice = Number(EstimatedPrice) + Number(minimumCharge);
 
 			datam1.per_km_charge = 0;
-			datam1.per_hr_charge = (typeof fareData.per_hr_charge !== 'undefined') ? fareData.per_hr_charge : 0;
+			datam1.per_hr_charge =
+				typeof fareData.per_hr_charge !== 'undefined'
+					? fareData.per_hr_charge
+					: 0;
 			datam1.min_hour = ignore_hrs;
-			datam1.min_distance = ignore_km;//ignore_hrs * 40;
+			datam1.min_distance = ignore_km; //ignore_hrs * 40;
 			datam1.minimum_charge = minimumCharge;
-
-		} else if (packagemodeid == 3) {        // Distance + hour Mode
+		} else if (packagemodeid == 3) {
+			// Distance + hour Mode
 
 			ignore_hrs = ignore_hrs; //(typeof fareData.minimum_hrs !== 'undefined') ? fareData.minimum_hrs : 0;
-			ignore_km = ignore_km;//(typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
-			minimumCharge = param.minimumCharge;//(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
-			let travel_hrs = parseInt(duration);        //come from travell distance hour//
+			ignore_km = ignore_km; //(typeof fareData.minimum_distance !== 'undefined') ? fareData.minimum_distance : 0;
+			minimumCharge = param.minimumCharge; //(typeof fareData.minimum_charge !== 'undefined') ? fareData.minimum_charge : 0;
+			let travel_hrs = parseInt(duration); //come from travell distance hour//
 			let hourlyRate = 0;
 			let distanceRate = 0;
 			if (distance < ignore_km) {
 				distanceRate = 0;
 			} else {
-				distanceRate = (distance - ignore_km) * ((typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0);
+				distanceRate =
+					(distance - ignore_km) *
+					(typeof fareData.per_km_charge !== 'undefined'
+						? fareData.per_km_charge
+						: 0);
 			}
 			if (travel_hrs < ignore_hrs) {
 				hourlyRate = 0;
 			} else {
 				hourlyRate = (travel_hrs - ignore_hrs) * 60;
-				let rate_per_min = ((typeof fareData.per_hr_charge) ? fareData.per_hr_charge : 0) / 60;
+				let rate_per_min =
+					(typeof fareData.per_hr_charge ? fareData.per_hr_charge : 0) / 60;
 				hourlyRate = hourlyRate * rate_per_min;
 			}
 
@@ -426,27 +463,43 @@ module.exports.getfareCalculation = async (param, fareData) => {
 
 			datam1.min_distance = ignore_km;
 			datam1.minimum_charge = minimumCharge;
-			datam1.per_km_charge = (typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0;
-			datam1.per_hr_charge = (typeof fareData.per_hr_charge !== 'undefined') ? fareData.per_hr_charge : 0;
+			datam1.per_km_charge =
+				typeof fareData.per_km_charge !== 'undefined'
+					? fareData.per_km_charge
+					: 0;
+			datam1.per_hr_charge =
+				typeof fareData.per_hr_charge !== 'undefined'
+					? fareData.per_hr_charge
+					: 0;
 			//console.log('mokk---',datam1);
-
-		} else if (packagemodeid == 4) {        //Distance + Waiting //
+		} else if (packagemodeid == 4) {
+			//Distance + Waiting //
 			//console.log(distance); //return false;
 			let ignore_hrs = 0;
-			let ignore_km = ignore_km;//(typeof fareData.minimum_distance) ? fareData.minimum_distance : 0;
-			let minimumCharge = minimumCharge;//(typeof fareData.minimum_charge) ? fareData.minimum_charge : 0;
+			let ignore_km = ignore_km; //(typeof fareData.minimum_distance) ? fareData.minimum_distance : 0;
+			let minimumCharge = minimumCharge; //(typeof fareData.minimum_charge) ? fareData.minimum_charge : 0;
 			//console.log(minimumCharge);return false;
 
 			if (distance > ignore_km) {
 				let ExtraKM = Number(distance) - Number(ignore_km);
-				let ExtraFare = ExtraKM * ((typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0);
+				let ExtraFare =
+					ExtraKM *
+					(typeof fareData.per_km_charge !== 'undefined'
+						? fareData.per_km_charge
+						: 0);
 				EstimatedPrice = Number(ExtraFare) + Number(minimumCharge);
 			} else {
 				EstimatedPrice = minimumCharge;
 			}
 
-			datam1.per_km_charge = (typeof fareData.per_km_charge !== 'undefined') ? fareData.per_km_charge : 0;
-			datam1.per_hr_charge = (typeof fareData.per_hr_charge !== 'undefined') ? fareData.per_hr_charge : 0;
+			datam1.per_km_charge =
+				typeof fareData.per_km_charge !== 'undefined'
+					? fareData.per_km_charge
+					: 0;
+			datam1.per_hr_charge =
+				typeof fareData.per_hr_charge !== 'undefined'
+					? fareData.per_hr_charge
+					: 0;
 			datam1.min_distance = ignore_km;
 			datam1.minimum_charge = minimumCharge;
 			//console.log(datam1);return false;
@@ -459,21 +512,19 @@ module.exports.getfareCalculation = async (param, fareData) => {
 		//console.log(datam1);
 		resolve(datam1);
 	});
-}
+};
 
 module.exports.getFareByPackagemodeId = async (pkgmodeid, basevehicleid) => {
 	let packagemodeid = pkgmodeid;
 	let sqlquery = '';
 	if (packagemodeid == 1) {
-		sqlquery = `SELECT * FROM distance_fare WHERE base_vehicle_id=${basevehicleid};`
+		sqlquery = `SELECT * FROM distance_fare WHERE base_vehicle_id=${basevehicleid};`;
 	} else if (packagemodeid == 2) {
-		sqlquery = `SELECT * FROM hourly_fare WHERE base_vehicle_id=${basevehicleid};`
-	}
-	else if (packagemodeid == 3) {
-		sqlquery = `SELECT * FROM distance_hour_fare WHERE base_vehicle_id=${basevehicleid};`
-	}
-	else if (packagemodeid == 4) {
-		sqlquery = `SELECT * FROM distance_waiting_fare WHERE base_vehicle_id=${basevehicleid};`
+		sqlquery = `SELECT * FROM hourly_fare WHERE base_vehicle_id=${basevehicleid};`;
+	} else if (packagemodeid == 3) {
+		sqlquery = `SELECT * FROM distance_hour_fare WHERE base_vehicle_id=${basevehicleid};`;
+	} else if (packagemodeid == 4) {
+		sqlquery = `SELECT * FROM distance_waiting_fare WHERE base_vehicle_id=${basevehicleid};`;
 	}
 
 	try {
@@ -486,8 +537,7 @@ module.exports.getFareByPackagemodeId = async (pkgmodeid, basevehicleid) => {
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-
-}
+};
 
 const checkFareExist = async (obj) => {
 	try {
@@ -515,16 +565,15 @@ const checkFareExist = async (obj) => {
 			AND  bc.status  ='1' `;
 			pool.query(sql, (err, results) => {
 				if (err) return rej(err);
-				if(results.length>0){
-					console.log(results.length)
+				if (results.length > 0) {
+					console.log(results.length);
 					res(true);
-				}else{
+				} else {
 					res(false);
 				}
-				
 			});
 		});
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};

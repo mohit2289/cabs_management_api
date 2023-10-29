@@ -8,7 +8,7 @@ const {
 } = require('../../../../middlewares/auth');
 const valid = require('../validations/user.validation');
 
-router.post('/addDistance', distanceController.addDistance);
-router.get('/getAllDistances', distanceController.getAllDistances);
+router.post('/add-city-distance', distanceController.addDistance);
+router.get('/get-all-distances', distanceController.getAllDistances);
 
 module.exports = router;

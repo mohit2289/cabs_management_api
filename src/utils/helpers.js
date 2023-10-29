@@ -123,7 +123,7 @@ module.exports = {
 		}
 		return obj;
 	},
-	generateBookingNo: () =>{
-		return result = Math.random().toString(36).substring(2,7).toUpperCase();
-	}
+	generateBookingNo: () => {
+		return (result = Math.random().toString(36).substring(2, 7).toUpperCase());
+	},
 };

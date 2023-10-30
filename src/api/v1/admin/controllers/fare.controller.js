@@ -91,7 +91,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	let local_pkg_fare_mode = '';
 	let local_pkg_name = '';
 	let duration = 0;
-	let driver_allowns = 300;
+	let driver_allowns = 0;
 	let searchVehicleDetail = [];
 	for (var i = 0; i < faredata.length; i++) {
 		let base_vehicle_id = faredata[i].base_vehicle_id;

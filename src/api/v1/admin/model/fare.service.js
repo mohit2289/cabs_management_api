@@ -266,18 +266,18 @@ module.exports.sp_fare_details = async (data) => {
 		  LEFT JOIN
 			master_package AS mp ON lp.id = mp.id 
 		  LEFT JOIN
+		  master_vehicle_model as vmodel ON vmodel.id =bvt.vehicle_master_id
+          LEFT JOIN
 			master_vehicle_type AS mvt ON bvt.vehicle_type_id = mvt.id 
-		  LEFT JOIN
-		  master_vehicle_model as vmodel ON mvt.id =vmodel.vehicle_type_id
 		  left join 
 		  master_city as city ON bc.city_id = city.id 
 		  left JOIN 
  		  distance_hour_fare AS dhf ON bvt.base_vehicle_id = dhf.base_vehicle_id
 		  WHERE
-		  	bc.city_id  = ${data.city_id} 
-			AND bc.master_package_mode_id = ${data.master_package_id} 
-			AND lpf.local_pkg_id =  ${data.local_pkg_id}
-			and bc.status  = 1 
+		  	bc.city_id  = "${data.city_id}"
+			AND bc.master_package_id = "${data.master_package_id}" 
+			AND lpf.local_pkg_id =  "${data.local_pkg_id}"
+			and bc.status  = "1" 
 			 ;`;
 			pool.query(sql, (err, results) => {
 				if (err) return rej(err);

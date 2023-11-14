@@ -5,6 +5,7 @@ const bookingController = require('../controllers/booking.controller');
 const valid = require('../validations/fare.validation');
 
 router.post('/add', bookingController.addbooking);
-router.get('/getbooking', bookingController.getAllFareList);
+router.get('/bookinglist', bookingController.getAllBooking);
+router.get('/booking-details/:id', bookingController.getBookingDetailById);
 
 module.exports = router;

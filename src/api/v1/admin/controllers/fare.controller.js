@@ -51,6 +51,7 @@ exports.getSearhCab = async (req, res) => {
 
 	const arrparam = {
 		city_id: city_id,
+		destination_city : req.body.destination_city,
 		master_package_id: master_package_id,
 		local_pkg_id: local_pkg_id,
 		seating_capacity: seating_capacity,
@@ -76,17 +77,19 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 
 	const getFareObj = {
 		city_id: arrobj.city_id,
+		destination_city: arrobj.destination_city,
 		master_package_id: arrobj.master_package_id,
 		local_pkg_id: arrobj.local_pkg_id,
 	};
 	const faredata = await FARE.sp_fare_details(getFareObj);
+	console.log(faredata)
 	let min_pkg_km = '';
 	let min_pkg_hrs = '';
 	let ignore_hrs = '';
 	let ignore_km = '';
 	let minimumCharge = '';
 	let minimum_charge = '';
-	let distance = '';
+	let distance = '0';
 	let totalbill = '';
 	let local_pkg_fare_mode = '';
 	let local_pkg_name = '';
@@ -95,11 +98,16 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	let searchVehicleDetail = [];
 	for (var i = 0; i < faredata.length; i++) {
 		let base_vehicle_id = faredata[i].base_vehicle_id;
-		let localpkgFare = await FARE.getPackageFareByPackageId(
-			base_vehicle_id,
-			local_pkg_id
-		);
-		let localpkgData = localpkgFare[0];
+		driver_allowns = faredata[i].driver_allowance;
+		let localpkgData;
+		minimumCharge = faredata[i].minimum_charge;
+		if(local_pkg_id){
+			let localpkgFare = await FARE.getPackageFareByPackageId(
+				base_vehicle_id,
+				local_pkg_id
+			);
+				localpkgData = localpkgFare[0];
+			}
 		if (typeof localpkgData !== 'undefined' && localpkgData != '') {
 			min_pkg_km = localpkgData.km;
 			min_pkg_hrs = localpkgData.hrs;
@@ -111,13 +119,13 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			local_pkg_fare_mode = localpkgData.package_mode_id;
 			local_pkg_name = localpkgData.name;
 			local_pkg_fare = localpkgData.local_pkg_fare;
-
+		}
 			let base_comb_id = faredata[i].base_comb_id;
 			let master_packge_mode_id = faredata[i].master_package_mode_id;
 			let package_mode = faredata[i].package_mode;
 
 			let city_name = faredata[i].city_name;
-			let base_vehicle_id = faredata[i].base_vehicle_id;
+			base_vehicle_id = faredata[i].base_vehicle_id;
 			let vehicle_type_id = faredata[i].master_vehicle_type_id;
 			let vehicle_category_id = faredata[i].vehicle_category_id;
 			let vehicle_image = faredata[i].vehicle_image;
@@ -177,8 +185,27 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 				vehicleFare.driver_allowns = driver_allowns;
 			}
 			searchVehicleDetail.push(vehicleFare);
-		}
+		//}
 	}
 	const resp = { status: 'success', data: searchVehicleDetail };
 	return searchVehicleDetail;
 };
+
+
+exports.saveCabSearchData = async(req,res) => {
+	try {
+		const result = await FARE.saveCabSearchData(req.body);
+		handleSuccess(res, result);
+	} catch (error) {
+		handleFailure(res, 500, error);
+	}
+}
+
+exports.getCabSearchData = async (req,res) =>{
+	try{
+		const result = await FARE.getCabSearchData();
+		handleSuccess(res, result);
+	}catch (error) {
+		handleFailure(res, 500, error);
+	}
+}

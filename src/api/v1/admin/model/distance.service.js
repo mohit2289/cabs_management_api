@@ -2,7 +2,7 @@ const pool = require('../../../../config/db');
 const moment = require('moment');
 
 module.exports.addDistance = async (data) => {
-	try {		
+	try {
 		data.added_date = moment(new Date()).format('yyyy-MM-DD hh:mm:ss');
 		return await new Promise((res, rej) => {
 			const sql = `INSERT INTO city_distance 

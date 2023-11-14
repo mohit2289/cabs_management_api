@@ -20,10 +20,10 @@ exports.addbooking = async (req, res) => {
  * @param {object} req HttpRequest Object
  * @param {object} res HttpResponse Object
  */
-exports.getAllFareList = async (req, res) => {
+exports.getAllBooking = async (req, res) => {
 	try {
-		const driverData = await FARE.getAllFareList();
-		handleSuccess(res, driverData);
+		const response = await BOOKING.getAllBookingList();
+		handleSuccess(res, response);
 	} catch (error) {
 		handleFailure(res, 500, error);
 	}
@@ -172,3 +172,14 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	const resp = { status: 'success', data: searchVehicleDetail };
 	return searchVehicleDetail;
 };
+
+
+exports.getBookingDetailById = async(req,res) => {
+	try {
+		console.log(req.params.id);
+		const response = await BOOKING.getBookingById(req.params.id);
+		handleSuccess(res, response);
+	} catch (error) {
+		handleFailure(res, 500, error);
+	}
+}

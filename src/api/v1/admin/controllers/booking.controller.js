@@ -1,5 +1,6 @@
 const { handleSuccess, handleFailure } = require('../../../../utils/helpers');
 const BOOKING = require('../model/booking.service');
+const {sendMailHelper} = require('../../../../utils/sendmail')
 
 /**
  * @description This method related to add a new city distance
@@ -9,6 +10,13 @@ const BOOKING = require('../model/booking.service');
 exports.addbooking = async (req, res) => {
 	try {
 		const result = await BOOKING.addbooking(req.body);
+		if(result.insertId>0){
+			const bookingData 	= await BOOKING.getBookingById(result.insertId);
+			const useremail 	=  bookingData[0].email;
+			const bookingObj 	= bookingData[0];			
+			const sendmailresp 	= await sendMailHelper(useremail, bookingObj);
+		}
+
 		handleSuccess(res, result);
 	} catch (error) {
 		handleFailure(res, 500, error);
@@ -173,8 +181,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	return searchVehicleDetail;
 };
 
-
-exports.getBookingDetailById = async(req,res) => {
+exports.getBookingDetailById = async (req, res) => {
 	try {
 		console.log(req.params.id);
 		const response = await BOOKING.getBookingById(req.params.id);
@@ -182,4 +189,4 @@ exports.getBookingDetailById = async(req,res) => {
 	} catch (error) {
 		handleFailure(res, 500, error);
 	}
-}
+};

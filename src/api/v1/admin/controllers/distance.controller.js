@@ -29,3 +29,14 @@ exports.getAllDistances = async (req, res) => {
 		handleFailure(res, 500, error);
 	}
 };
+
+exports.getCityDistances = async(req,res) => {
+	try {
+		const formCity  = req.body.from_city; 
+		const toCity  = req.body.to_city; 
+		const allDistances = await DISTANCE.getCityDistanceByCityId(formCity,toCity);
+		handleSuccess(res, allDistances);
+	} catch (error) {
+		handleFailure(res, 500, error);
+	}
+}

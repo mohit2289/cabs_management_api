@@ -20,7 +20,7 @@ module.exports.addbooking = async (data) => {
 	}
 };
 
-module.exports.getAllBookingList= async(data) => {
+module.exports.getAllBookingList = async (data) => {
 	try {
 		return await new Promise((res, rej) => {
 			const sql = ` Select bk.*, vm.name as vehice_name, mp.name as booking_type
@@ -40,18 +40,20 @@ module.exports.getAllBookingList= async(data) => {
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
-module.exports.getBookingById = async(bookingid) => {
+module.exports.getBookingById = async (bookingid) => {
 	try {
 		return await new Promise((res, rej) => {
-			const sql = ` Select bk.*, vm.name as vehice_name, mp.name as booking_type,bkest.*
+			const sql = ` Select bk.*, vm.name as vehice_name, mp.name as booking_type,bkest.*, lp.name as local_package_name,city.name as city_name
 							FROM
 							booking AS bk
 							INNER JOIN
 							booking_estimation AS bkest ON  bkest.booking_id = bk.booking_id
 							LEFT join master_vehicle_model as vm ON bk.vehicle_master_id = vm.id
 							LEFT JOIN master_package as mp ON bk.master_package_id = mp.id
+							LEFT JOIN local_package as lp ON bk.package_id = lp.id
+							LEFT JOIN master_city as city ON bk.pickup_city = city.id
 							where bk.booking_id = ${bookingid}					
 							;`;
 			pool.query(sql, (err, results) => {
@@ -62,7 +64,7 @@ module.exports.getBookingById = async(bookingid) => {
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
 const addNewBooking = async (data) => {
 	try {
@@ -80,6 +82,7 @@ const addNewBooking = async (data) => {
 		user_id,
 		booking_reference,
 		booking_status,
+		package_id,
 		master_package_mode_id,
 		master_package_id,
 		master_vehicle_type_id,
@@ -89,17 +92,19 @@ const addNewBooking = async (data) => {
 		mobile, 
 		email, 
 		passenger, 
-		pickup_address, 		
+		pickup_address,
+		pickup_city, 		
 		drop_address, 
 		travel_date, 
 		travel_time,
 		created_date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);`;
 
 			const {
 				user_id,
 				booking_reference,
 				booking_status,
+				package_id,
 				master_package_mode_id,
 				master_package_id,
 				master_vehicle_type_id,
@@ -110,6 +115,7 @@ const addNewBooking = async (data) => {
 				email,
 				passenger,
 				pickup_address,
+				pickup_city,
 				drop_address,
 				travel_date,
 				travel_time,
@@ -122,6 +128,7 @@ const addNewBooking = async (data) => {
 					user_id,
 					booking_reference,
 					booking_status,
+					package_id,
 					master_package_mode_id,
 					master_package_id,
 					master_vehicle_type_id,
@@ -132,6 +139,7 @@ const addNewBooking = async (data) => {
 					email,
 					passenger,
 					pickup_address,
+					pickup_city,
 					drop_address,
 					travel_date,
 					travel_time,
@@ -228,12 +236,3 @@ const addDistanceHourExtraCharges = async (data) => {
 		console.log(`${err.name}: ${err.message}`);
 	}
 };
-
-
-
-
-
-
-
-
-

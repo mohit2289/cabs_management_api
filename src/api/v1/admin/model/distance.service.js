@@ -38,3 +38,20 @@ module.exports.getAllDistances = async () => {
 		console.log(`${err.name}: ${err.message}`);
 	}
 };
+
+
+module.exports.getCityDistanceByCityId = async (fromcity,tocity) => {
+	try {
+		if(fromcity!='' && tocity!=''){
+			return await new Promise((res, rej) => {
+				const sql = `SELECT dist.from_city,city.name as from_city_name, dist.to_city, city2.name as to_city_name, dist.distance, dist.status FROM city_distance as dist left join master_city as city ON dist.from_city = city.id  left join master_city as city2 ON dist.to_city = city2.id  where dist.from_city= ${fromcity} and dist.to_city=${tocity};`;
+				pool.query(sql, (err, results) => {
+					if (err) return rej(err);
+					res(results);
+				});
+			});
+		}
+	} catch (err) {
+		console.log(`${err.name}: ${err.message}`);
+	}
+};

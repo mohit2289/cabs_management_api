@@ -193,7 +193,8 @@ module.exports.getAllFareList = async (data) => {
 			const sql = ` Select 
 			bc.id AS base_comb_id,
             bc.city_id,			
-			city.name as city_name,		
+			city.name as city_name,	
+			city2.name as destination_city_name,	
 			bvt.base_vehicle_id	,
 			lpf.local_pkg_id,           
              lp.name as local_pkg_name,
@@ -230,8 +231,10 @@ module.exports.getAllFareList = async (data) => {
 		  master_vehicle_model as vmodel ON bvt.vehicle_master_id = vmodel.id
  		LEFT JOIN 
  		  distance_hour_fare AS dhf ON bvt.base_vehicle_id = dhf.base_vehicle_id
-		   INNER join 
-		   master_city as city ON bc.city_id = city.id 
+		LEFT join 
+		master_city as city ON bc.city_id = city.id 
+		LEFT join 
+		master_city as city2 ON bc.destination_city = city2.id 
 		   WHERE
 			bc.status  ='1'
 			 ;`;
@@ -580,11 +583,35 @@ module.exports.saveCabSearchData = async (data) => {
         (username, mobile, pickup_city, drop_city, pickup_address, drop_address, package, module_name, pickup_date, pickup_time, added_date) 
         VALUES (?, ?, ?, ?, ?, ? ,? ,?, ?, ? ,?);`;
 
-			const { username, mobile, pickup_city_name, drop_city_name, pickup_address, drop_address, package_name, module_name, pickup_date, pickup_time, added_date } = data;
+			const {
+				username,
+				mobile,
+				pickup_city_name,
+				drop_city_name,
+				pickup_address,
+				drop_address,
+				package_name,
+				module_name,
+				pickup_date,
+				pickup_time,
+				added_date,
+			} = data;
 
 			pool.query(
 				sql,
-				[username, mobile, pickup_city_name, drop_city_name, pickup_address, drop_address, package_name, module_name, pickup_date, pickup_time, added_date],
+				[
+					username,
+					mobile,
+					pickup_city_name,
+					drop_city_name,
+					pickup_address,
+					drop_address,
+					package_name,
+					module_name,
+					pickup_date,
+					pickup_time,
+					added_date,
+				],
 				(err, results) => {
 					console.log(sql);
 					if (err) return rej(err);
@@ -595,7 +622,7 @@ module.exports.saveCabSearchData = async (data) => {
 	} catch (err) {
 		console.log(`${err.name}: ${err.message}`);
 	}
-}
+};
 
 module.exports.getCabSearchData = async (data) => {
 	try {
@@ -617,11 +644,14 @@ const checkFareExist = async (obj) => {
 		let wherecondition = '';
 		let localPkgColumn = '';
 		if (obj.master_package_id == '1') {
-
-			joincondition = 'INNER JOIN  local_package_fare AS lpf ON bvt.base_vehicle_id = lpf.base_vehicle_id';
+			joincondition =
+				'INNER JOIN  local_package_fare AS lpf ON bvt.base_vehicle_id = lpf.base_vehicle_id';
 			wherecondition = `AND  lpf.local_pkg_id = ${obj.local_package}`;
 			localPkgColumn = ', lpf.local_pkg_id, lpf.local_pkg_fare';
+		}
 
+		if (obj.master_package_id == '2') {
+			wherecondition = ` AND  bc.destination_city = ${obj.destination_city}`;
 		}
 
 		return await new Promise((res, rej) => {

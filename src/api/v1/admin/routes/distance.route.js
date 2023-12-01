@@ -10,5 +10,5 @@ const valid = require('../validations/user.validation');
 
 router.post('/add-city-distance', distanceController.addDistance);
 router.get('/get-all-distances', distanceController.getAllDistances);
-
+router.post('/get-city-distance', distanceController.getCityDistances);
 module.exports = router;

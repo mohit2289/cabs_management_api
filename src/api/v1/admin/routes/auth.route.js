@@ -8,6 +8,7 @@ const payloadValidation = require('../validations/auth.validation');
 const authController = require('../controllers/auth.controller');
 
 router.post('/login', payloadValidation.login, authController.login);
+router.post('/signup', payloadValidation.registeruser, authController.registration);
 router.post(
 	'/reset-password',
 	payloadValidation.resetpass,

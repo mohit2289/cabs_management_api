@@ -48,3 +48,17 @@ exports.resetPassword = async (req, res) => {
 		}
 	}
 };
+
+exports.registration = async(req,res) => {
+	try{
+		const resp = await USER.registration(req.body);
+		handleSuccess(res, resp, 'User register successfully');
+	}
+	catch (error) {
+		if (error.status == 400) {
+			handleFailure(res, error.status, error.data.message);
+		} else {
+			handleFailure(res, 500, error);
+		}
+	}
+}

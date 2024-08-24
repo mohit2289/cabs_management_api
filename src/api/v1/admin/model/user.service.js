@@ -5,12 +5,12 @@ const pool = require('../../../../config/db');
  * @returns
  */
 module.exports.authentication = async (data) => {
-	const { email, password } = data;
+	const { mobile, password } = data;
 	try {
 		return await new Promise((res, rej) => {
 			pool.query(
-				'Select * from users where email=? and password=?',
-				[email, password],
+				'Select * from users where mobile=? and password=?',
+				[mobile, password],
 				(err, results) => {
 					if (err) return rej(err);
 					res(results);
@@ -89,3 +89,32 @@ module.exports.addDriver = async (data) => {
 		console.log(`${err.name}: ${err.message}`);
 	}
 };
+
+
+module.exports.registration = async(data) => {
+	try {
+		return await new Promise((res, rej) => {
+			const sql = `INSERT INTO users 
+        	(username, 
+			mobile,
+			email, 
+			password
+			) VALUES (?,?,?,?);`;
+			pool.query(
+				sql,
+				[
+					data.username,
+					data.mobile,
+					data.email,
+					data.password
+				],
+				(err, results) => {
+					if (err) return rej(err);
+					res(results);
+				}
+			);
+		});
+	} catch (err) {
+		console.log(`${err.name}: ${err.message}`);
+	}
+}

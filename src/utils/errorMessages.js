@@ -56,6 +56,7 @@ module.exports = {
 	},
 	authMsg: {
 		username: 'username is required',
+		mobile: 'Mobile no is required',
 		email: 'username must be valid email id',
 		password:
 			'Password is required and must be min 8 characters, max 16 characters, Alphanumeric value allowed, include at least 1 uppercase value, 1 numeric value, 1 special character',

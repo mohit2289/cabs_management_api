@@ -10,7 +10,7 @@ const passRegexp =
 	/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,16}$/;
 
 const login = Joi.object().keys({
-	email: Joi.string().email().required().error(new Error(authMsg.email)),
+	mobile: Joi.string().required().error(new Error(authMsg.mobile)),
 	password: Joi.string()
 		.required()
 		.min(6)
@@ -29,6 +29,18 @@ const resetpass = Joi.object().keys({
 		.valid(Joi.ref('newPassword'))
 		.error(new Error(authMsg.confirmPassword)),
 });
+
+const registeruser  = Joi.object().keys({
+	username: Joi.string().required().error(new Error('Enter Username')),
+	mobile: Joi.string().required().error(new Error(authMsg.mobile)),
+	email: Joi.string().email().required().error(new Error(authMsg.email)),
+	password: Joi.string()
+		.required()
+		.min(6)
+		.max(16)
+		//.regex(passRegexp)
+		.error(new Error(authMsg.password)),
+})
 /**
  * @description Login function
  * @param {object} req Request object
@@ -60,3 +72,13 @@ module.exports.resetpass = async (req, res, next) => {
 		handleFailure(res, 400, error.message);
 	}
 };
+
+module.exports.registeruser = async(req,res,next) => {
+	try {
+		const result = Joi.validate(req.body, registeruser);
+		if (result.error) throw result.error;
+		next();
+	} catch (error) {
+		handleFailure(res, 400, error.message);
+	}
+}

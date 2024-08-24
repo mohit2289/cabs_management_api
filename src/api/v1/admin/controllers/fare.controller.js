@@ -82,7 +82,6 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 		local_pkg_id: arrobj.local_pkg_id,
 	};
 	const faredata = await FARE.sp_fare_details(getFareObj);
-	console.log(faredata);
 	let min_pkg_km = '';
 	let min_pkg_hrs = '';
 	let ignore_hrs = '';
@@ -135,8 +134,8 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 		let vehicle_color = faredata[i].vehicle_color;
 		let ignition_type = faredata[i].ignition_type;
 		let vehicle_baggage = faredata[i].luggage;
-		let seating_capacity = faredata[i].seating_capacity;
-		let luggage = faredata[i].luggage;
+		let seating_capacity = faredata[i].person_capacity;
+		let luggage = faredata[i].luggage_capacity;
 
 		if (local_pkg_fare_mode != '') {
 			master_packge_mode_id = local_pkg_fare_mode;
@@ -183,6 +182,8 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			vehicleFare.min_pkg_km = min_pkg_km;
 			vehicleFare.min_pkg_hrs = min_pkg_hrs;
 			vehicleFare.driver_allowns = driver_allowns;
+			vehicleFare.seating_capacity = seating_capacity;
+			vehicleFare.luggage = luggage;
 		}
 		searchVehicleDetail.push(vehicleFare);
 		//}

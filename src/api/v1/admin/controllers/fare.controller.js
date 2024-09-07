@@ -136,6 +136,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 		let vehicle_baggage = faredata[i].luggage;
 		let seating_capacity = faredata[i].person_capacity;
 		let luggage = faredata[i].luggage_capacity;
+		let vehicle_model_image = faredata[i].vehicle_model_image;
 
 		if (local_pkg_fare_mode != '') {
 			master_packge_mode_id = local_pkg_fare_mode;
@@ -184,6 +185,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			vehicleFare.driver_allowns = driver_allowns;
 			vehicleFare.seating_capacity = seating_capacity;
 			vehicleFare.luggage = luggage;
+			vehicleFare.vehicle_model_image = vehicle_model_image;
 		}
 		searchVehicleDetail.push(vehicleFare);
 		//}

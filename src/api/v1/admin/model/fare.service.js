@@ -277,6 +277,7 @@ module.exports.sp_fare_details = async (data) => {
 			vmodel.name  as vehicle_name,
 			vmodel.person_capacity,
 			vmodel.luggage_capacity,
+			vmodel.image as vehicle_model_image,
 			mvt.vehicle_image,
 			mvt.seating_capacity,
 			mvt.amenities,

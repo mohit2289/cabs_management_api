@@ -48,6 +48,10 @@ exports.getSearhCab = async (req, res) => {
 	const pickup_date = req.body.pickup_date; // Pickup Date
 	const pickup_time = req.body.pickup_time; // Pickup time
 	const pickup_date_time = pickup_date + ' ' + pickup_time;
+	const distance =
+		typeof req.body.distance != 'undefined' ? Number(req.body.distance) : 0;
+		const total_days =
+		typeof req.body.days != 'undefined' ? Number(req.body.days) : 0;
 
 	const arrparam = {
 		city_id: city_id,
@@ -56,6 +60,8 @@ exports.getSearhCab = async (req, res) => {
 		local_pkg_id: local_pkg_id,
 		seating_capacity: seating_capacity,
 		luggage: luggage,
+		distance: distance,
+		total_days :total_days
 	};
 
 	const faredata = await getFareDataByCityIdPackageId(arrparam);
@@ -74,6 +80,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	const luggage = arrobj.luggage;
 	const masterpackagemodeid = arrobj.masterpackagemodeid;
 	const local_pkg_id = arrobj.local_pkg_id;
+	const total_days = arrobj.total_days;
 
 	const getFareObj = {
 		city_id: arrobj.city_id,
@@ -88,7 +95,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 	let ignore_km = '';
 	let minimumCharge = '';
 	let minimum_charge = '';
-	let distance = '0';
+	let distance = (arrobj.distance)?arrobj.distance:'0';
 	let totalbill = '';
 	let local_pkg_fare_mode = '';
 	let local_pkg_name = '';
@@ -151,6 +158,7 @@ const getFareDataByCityIdPackageId = async (arrobj) => {
 			ignore_km: ignore_km,
 			distance: distance,
 			duration: duration,
+			total_days: total_days,
 		};
 
 		let getmodeFare = await FARE.getFareByPackagemodeId(

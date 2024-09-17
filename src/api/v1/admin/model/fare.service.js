@@ -368,7 +368,7 @@ module.exports.getfareCalculation = async (param, fareData) => {
 		let packagemodeid = param.master_package_mode_id;
 		let status = param.status;
 		let ignore_hrs = param.ignore_hrs;
-		let ignore_km = param.ignore_km;
+		let ignore_km = (param.ignore_km)?param.ignore_km:0;
 		let minimumCharge = param.minimumCharge;
 		let master_package_type = param.master_package_type;
 		let total_days = param.total_days;
@@ -420,7 +420,7 @@ module.exports.getfareCalculation = async (param, fareData) => {
 		}
 
 		if (packagemodeid == 1) {
-			let distance = distance; // This will come from local package //
+			distance = distance; // This will come from local package //
 			let travel_hrs = ignore_hrs;
 
 			if (distance > ignore_km) {
